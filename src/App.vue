@@ -1,13 +1,68 @@
-<script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + Vite" />
+  <div class="qr-stream-wrap">
+    <QrcodeStream
+      v-show="qrScan"
+      :camera="camera"
+      @decode="onDecode"
+      @init="onInit"
+    >
+      <div v-if="camera === 'off'" class="validation-pending">Loading ...</div>
+    </QrcodeStream>
+
+    <div v-show="!qrScan" class="qr-input">
+      <div>
+        {{ result }}
+      </div>
+      <button @click="openQrScan">สแกน</button>
+    </div>
+  </div>
 </template>
+
+<script>
+import { QrcodeStream } from 'vue3-qrcode-reader'
+export default {
+  components: {
+    QrcodeStream,
+  },
+
+  data() {
+    return {
+      camera: 'auto',
+      result: null,
+
+      qrScan: false,
+    }
+  },
+
+  methods: {
+    onInit(promise) {
+      promise
+        .catch(console.error)
+    },
+
+    openQrScan() {
+      this.result = null
+      this.qrScan = true
+    },
+
+    async onDecode(content) {
+      this.camera = 'off'
+
+      // pretend it's taking really long
+      await this.timeout(3000)
+      this.camera = 'auto'
+      this.result = content
+      this.qrScan = false
+    },
+
+    timeout(ms) {
+      return new Promise(resolve => {
+        window.setTimeout(resolve, ms)
+      })
+    }
+  }
+}
+</script>
 
 <style>
 #app {
@@ -17,5 +72,38 @@ import HelloWorld from './components/HelloWorld.vue'
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.qr-stream-wrap {
+  max-width: 600px;
+  margin: auto;
+}
+
+.qr-input {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 10px;
+  border: 1px solid;
+}
+
+.validation-success,
+.validation-failure,
+.validation-pending {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.4rem;
+  padding: 10px;
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+}
+.validation-pending {
+  color: gold;
 }
 </style>
