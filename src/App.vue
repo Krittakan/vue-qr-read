@@ -1,7 +1,7 @@
 <template>
   <div class="qr-stream-wrap">
     <QrcodeStream
-      v-show="qrScan"
+      v-if="qrScan"
       :camera="camera"
       @decode="onDecode"
       @init="onInit"
@@ -9,7 +9,7 @@
       <div v-if="camera === 'off'" class="validation-pending">Loading ...</div>
     </QrcodeStream>
 
-    <div v-show="!qrScan" class="qr-input">
+    <div v-if="!qrScan" class="qr-input">
       <div>
         {{ result }}
       </div>
@@ -30,7 +30,7 @@ export default {
       camera: 'auto',
       result: null,
 
-      qrScan: false,
+      qrScan: true,
     }
   },
 
